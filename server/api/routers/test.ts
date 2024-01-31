@@ -7,7 +7,7 @@ export const testRouter = createTRPCRouter({
     return prisma.task.findMany();
   }),
   addTodo: publicProcedure
-    .input(z.string())
+    .input(z.string().min(1))
     .mutation(async ({ ctx, input }) => {
       return await ctx.prisma.task.create({
         data: {

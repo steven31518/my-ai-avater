@@ -17,6 +17,12 @@ export default function TodoList({
   });
 
   const addTodo = api.test.addTodo.useMutation({
+    onError: (err) => {
+      const { data } = err;
+      if (data?.ZodError?.formErrors) {
+        toast.error(data.ZodError.formErrors[0]);
+      }
+    },
     onSuccess: () => {
       toast.success("Todo added");
     },
