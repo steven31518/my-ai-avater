@@ -1,5 +1,5 @@
 import Image from "next/image";
-import TodoList from "@/app/_components/TodoList";
+import TodoList from "@/components/TodoList";
 import { serverClient } from "@/app/_trpc/server";
 
 export default async function Todo() {

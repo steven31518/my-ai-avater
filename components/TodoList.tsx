@@ -1,9 +1,10 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { api } from "../_trpc/react";
+import { api } from "../app/_trpc/react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { serverClient } from "../_trpc/server";
+import { serverClient } from "../app/_trpc/server";
+import toast from "react-hot-toast";
 export default function TodoList({
   initialTodos,
 }: {
@@ -16,6 +17,9 @@ export default function TodoList({
   });
 
   const addTodo = api.test.addTodo.useMutation({
+    onSuccess: () => {
+      toast.success("Todo added");
+    },
     onSettled: () => {
       getTodo.refetch();
     },
