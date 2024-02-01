@@ -1,4 +1,4 @@
-import { prisma } from "./../../db";
+
 import { publicProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
 export const testRouter = createTRPCRouter({

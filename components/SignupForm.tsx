@@ -9,6 +9,7 @@ import { CustomFormField } from "./FormComponents";
 import validator from "validator";
 import { useEffect, useState } from "react";
 import { passwordStrength } from "check-password-strength";
+import PasswordStrength from "./PasswordStrength";
 
 const formSchema = z
   .object({
@@ -56,7 +57,9 @@ export default function SignupForm() {
       phoneNumber: "",
     },
   });
+
   const password = form.watch().password;
+
   const [passStrength, setPassStrength] = useState(0);
 
   function onSubmit(data: z.infer<typeof formSchema>) {
@@ -72,7 +75,7 @@ export default function SignupForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-muted p-8 rounded"
+        className="bg-muted p-8 rounded w-full"
       >
         <h2 className="capitalize font-semibold text-4xl mb-6">Sign Up</h2>
         <div className="grid gap-4 md:grid-cols-2 items-start">
@@ -80,11 +83,15 @@ export default function SignupForm() {
           <CustomFormField name="lastName" control={form.control} />
           <CustomFormField name="email" control={form.control} />
           <CustomFormField name="phoneNumber" control={form.control} />
-          <CustomFormField
-            name="password"
-            control={form.control}
-            type="password"
-          />
+          <div className="space-y-2">
+            <CustomFormField
+              name="password"
+              control={form.control}
+              type="password"
+            />
+            <PasswordStrength passStrength={passStrength}></PasswordStrength>
+          </div>
+
           <CustomFormField
             name="confirmPassword"
             control={form.control}
