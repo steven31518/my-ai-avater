@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { CustomFormField } from "./FormComponents";
 import validator from "validator";
+import { useEffect, useState } from "react";
+import { passwordStrength } from "check-password-strength";
 
 const formSchema = z
   .object({
@@ -33,18 +35,13 @@ const formSchema = z
       .string()
       .min(6, { message: "Password must be at least 6 characters" })
       .max(8, { message: "Password must be less than 8 characters" }),
-    phoneNumber: z.string().refine((val) => val.length === 10, {
-      message: "Phone number must be 10 digits",
-    }),
+    phoneNumber: z
+      .string()
+      .refine(validator.isMobilePhone, "Please enter a valid phone number"),
   })
-  .superRefine(({ password, confirmPassword }, ctx) => {
-    if (password !== confirmPassword) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Passwords must match",
-        path: ["confirmPassword"],
-      });
-    }
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: "Password and confirm password must match",
+    path: ["password", "confirmPassword"],
   });
 
 export default function SignupForm() {
@@ -59,11 +56,18 @@ export default function SignupForm() {
       phoneNumber: "",
     },
   });
+  const password = form.watch().password;
+  const [passStrength, setPassStrength] = useState(0);
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     const { confirmPassword, ...signupData } = data;
     console.log(signupData);
   }
+
+  useEffect(() => {
+    setPassStrength(passwordStrength(password).id);
+  }, [password]);
+
   return (
     <Form {...form}>
       <form
@@ -72,11 +76,8 @@ export default function SignupForm() {
       >
         <h2 className="capitalize font-semibold text-4xl mb-6">Sign Up</h2>
         <div className="grid gap-4 md:grid-cols-2 items-start">
-          {/* position */}
           <CustomFormField name="firstName" control={form.control} />
-          {/* company */}
           <CustomFormField name="lastName" control={form.control} />
-          {/* location */}
           <CustomFormField name="email" control={form.control} />
           <CustomFormField name="phoneNumber" control={form.control} />
           <CustomFormField
@@ -89,7 +90,7 @@ export default function SignupForm() {
             control={form.control}
             type="password"
           />
-          <Button type="submit" className="col-start-2capitalize">
+          <Button type="submit" className="col-start-2 capitalize">
             Submit
           </Button>
         </div>
