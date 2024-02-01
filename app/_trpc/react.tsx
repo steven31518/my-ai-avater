@@ -1,6 +1,5 @@
 "use client";
 import { createTRPCReact, httpBatchLink } from "@trpc/react-query";
-
 import { type AppRouter } from "@/server/api/root";
 import { useState } from "react";
 import { QueryClient } from "@tanstack/react-query";
