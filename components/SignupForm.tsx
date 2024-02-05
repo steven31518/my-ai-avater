@@ -87,10 +87,7 @@ export default function SignupForm() {
 
   const { isPending, mutate } = api.auth.register.useMutation({
     onError: (err) => {
-      const { data } = err;
-      if (data?.ZodError?.formErrors) {
-        toast.error(data.ZodError.formErrors[0]);
-      }
+      toast.error(err.message);
     },
     onSuccess: () => {
       toast.success("User registered");
