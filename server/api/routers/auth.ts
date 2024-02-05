@@ -1,3 +1,4 @@
+import { compileActivationTemplate, sendMail } from "@/lib/mail";
 import { publicProcedure, createTRPCRouter } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import * as bcrypt from "bcrypt";
@@ -25,9 +26,21 @@ export const authRouter = createTRPCRouter({
           code: "BAD_REQUEST",
           message: "User already exists.",
         });
-      await ctx.prisma.user.create({
+
+      const result = await ctx.prisma.user.create({
         data: { ...input, password: await bcrypt.hash(input.password, 10) },
       });
-      return "User created successfully.";
+
+      const activationUrl = `${process.env.NEXTAUTH_URL}/auth/activation/${result.id}`;
+
+      const body = compileActivationTemplate(input.firstName, activationUrl);
+
+      await sendMail({
+        to: input.email,
+        subject: "Activate your account",
+        body,
+      });
+
+      return result;
     }),
 });

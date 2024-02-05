@@ -90,7 +90,7 @@ export default function SignupForm() {
       toast.error(err.message);
     },
     onSuccess: (data) => {
-      toast.success(data);
+      toast.success(`Account created successfully`);
     },
   });
 

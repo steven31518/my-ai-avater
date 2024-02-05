@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import Handlebars from "handlebars";
+import { activationTemplate } from "./emailTemplates/activation";
 export async function sendMail({
   to,
   subject,
@@ -17,5 +19,27 @@ export async function sendMail({
       pass: process.env.EMAIL_SERVER_PASSWORD, // generated ethereal password
     },
   });
-  await transporter.sendMail({});
+  try {
+    const testResult = await transporter.verify();
+    console.log("Email Server is Ready to take our messages: ", testResult);
+  } catch (e) {
+    console.log(e);
+  }
+  try {
+    const sendMailResult = await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
+      subject,
+      html: body,
+    });
+    console.log("Message sent: %s", sendMailResult);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function compileActivationTemplate(name: string, url: string) {
+  const template = Handlebars.compile(activationTemplate);
+  const htmlBody = template({ name, url });
+  return htmlBody;
 }
