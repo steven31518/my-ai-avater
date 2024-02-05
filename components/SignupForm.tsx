@@ -1,7 +1,7 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -49,15 +49,24 @@ const formSchema = z
       }),
     }),
   })
-  .refine(
-    (data) => {
-      return data.password === data.confirmPassword;
-    },
-    {
-      message: "Passwords and confirmPassword do not match",
-      path: ["confirmPassword"],
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: "custom", //z.ZodIssueCode.custom,
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      });
     }
-  );
+  });
+// .refine(
+//   (data) => {
+//     return data.password === data.confirmPassword;
+//   },
+//   {
+//     message: "Passwords and confirmPassword do not match",
+//     path: ["confirmPassword"],
+//   }
+// );
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({

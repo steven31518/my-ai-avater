@@ -5,18 +5,11 @@ import * as bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
 export const authOptions: AuthOptions = {
-  // callbacks: {
-  //   session: async ({ session, user }) => ({
-  //     ...session,
-  //     user: {
-  //       ...session.user,
-  //       id: user.id,
-  //     },
-  //   }),
-  // },
+  pages:{
+    signIn:"/auth/signin",
+  },
   callbacks: {
     async jwt({ token, user }) {
-      
       if (user) token.user = user as User;
       return token;
     },

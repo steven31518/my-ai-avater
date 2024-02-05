@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 
 export default function SigninButton() {
   const { data: session } = useSession();
-  console.log(session)
+
   return (
     <div className="flex items-center gap-2">
       {session && session.user ? (

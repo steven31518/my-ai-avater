@@ -71,8 +71,14 @@ export function CustomFormFieldCheckbox({
           <div className="space-y-1 leading-none">
             <FormLabel>Accept terms and conditions</FormLabel>
             <FormDescription>
-              You agree to our <Link href="/examples/forms">terms</Link> of
-              Service and Privacy Policy.
+              You agree to our{" "}
+              <Link
+                href="/examples/forms"
+                className="text-sky-500 hover:text-sky-600 transition-colors"
+              >
+                terms
+              </Link>
+              of Service and Privacy Policy.
             </FormDescription>
           </div>
         </FormItem>
