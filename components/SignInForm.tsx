@@ -53,7 +53,7 @@ export default function SignInForm(props: Props) {
         <div className="flex flex-col gap-2">
           <CustomFormField name="email" control={form.control} />
           <CustomFormFieldPassword name="password" control={form.control} />
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center my-6">
             <Button
               type="submit"
               className="capitalize w-48"

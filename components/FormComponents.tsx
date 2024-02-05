@@ -78,7 +78,7 @@ export function CustomFormFieldCheckbox({
               >
                 terms
               </Link>
-              of Service and Privacy Policy.
+              {" "}of Service and Privacy Policy.
             </FormDescription>
           </div>
         </FormItem>

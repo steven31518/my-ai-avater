@@ -1,4 +1,5 @@
 import { publicProcedure, createTRPCRouter } from "../trpc";
+import { TRPCError } from "@trpc/server";
 import * as bcrypt from "bcrypt";
 import { z } from "zod";
 
@@ -19,7 +20,11 @@ export const authRouter = createTRPCRouter({
           email: input.email,
         },
       });
-      if (user) throw new Error("User already exists.");
+      if (user)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User already exists.",
+        });
       await ctx.prisma.user.create({
         data: { ...input, password: await bcrypt.hash(input.password, 10) },
       });
