@@ -14,8 +14,15 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.prisma.user.create({
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          email: input.email,
+        },
+      });
+      if (user) throw new Error("User already exists.");
+      await ctx.prisma.user.create({
         data: { ...input, password: await bcrypt.hash(input.password, 10) },
       });
+      return "User created successfully.";
     }),
 });
