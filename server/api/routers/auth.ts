@@ -40,13 +40,14 @@ export const authRouter = createTRPCRouter({
       const body = compileActivationTemplate(result.firstName, activationUrl);
 
       await sendMail({
-        to: input.email,
+        to: result.email,
         subject: "Activate your account",
         body,
       });
 
       return result;
     }),
+
   emailValidation: publicProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
@@ -57,20 +58,14 @@ export const authRouter = createTRPCRouter({
           id: userId,
         },
       });
-      if (!user)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "User not found.",
-        });
-      if (user.emailVerified)
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Email already verified.",
-        });
+      if (!user) return "userNotExist";
+
+      if (user.emailVerified) return "alreadyActivated";
+
       const result = await ctx.prisma.user.update({
         where: { id: userId },
         data: { emailVerified: new Date() },
       });
-      return result;
+      return `Your Account: ${result.email} has been activated successfully.`;
     }),
 });

@@ -5,8 +5,8 @@ import * as bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 
 export const authOptions: AuthOptions = {
-  pages:{
-    signIn:"/auth/signin",
+  pages: {
+    signIn: "/auth/signin",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -45,6 +45,7 @@ export const authOptions: AuthOptions = {
         );
         if (!isPasswordCorrect)
           throw new Error("User name and password is not correct.");
+        if (!user.emailVerified) throw new Error("Please verify your email.");
 
         const { password, ...userWithoutPassword } = user;
 
