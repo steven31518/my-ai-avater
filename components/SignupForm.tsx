@@ -87,6 +87,7 @@ export default function SignupForm() {
 
   const { isPending, mutate } = api.auth.register.useMutation({
     onError: (err) => {
+      console.log("onError", err);
       toast.error(err.message);
     },
     onSuccess: (data) => {

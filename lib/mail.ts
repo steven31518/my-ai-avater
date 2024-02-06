@@ -21,7 +21,6 @@ export async function sendMail({
   });
   try {
     const testResult = await transporter.verify();
-    console.log("Email Server is Ready to take our messages: ", testResult);
   } catch (e) {
     console.log(e);
   }
@@ -32,7 +31,6 @@ export async function sendMail({
       subject,
       html: body,
     });
-    console.log("Message sent: %s", sendMailResult);
   } catch (e) {
     console.log(e);
   }

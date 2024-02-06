@@ -3,6 +3,8 @@ import { publicProcedure, createTRPCRouter } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import * as bcrypt from "bcrypt";
 import { z } from "zod";
+import { signJwt } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
@@ -31,9 +33,11 @@ export const authRouter = createTRPCRouter({
         data: { ...input, password: await bcrypt.hash(input.password, 10) },
       });
 
-      const activationUrl = `${process.env.NEXTAUTH_URL}/auth/activation/${result.id}`;
+      const jwtUserId = signJwt({ id: result.id });
 
-      const body = compileActivationTemplate(input.firstName, activationUrl);
+      const activationUrl = `${process.env.NEXTAUTH_URL}/auth/activation/${jwtUserId}`;
+
+      const body = compileActivationTemplate(result.firstName, activationUrl);
 
       await sendMail({
         to: input.email,
@@ -41,6 +45,32 @@ export const authRouter = createTRPCRouter({
         body,
       });
 
+      return result;
+    }),
+  emailValidation: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const payload = verifyJwt(input);
+      const userId = payload?.id;
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User not found.",
+        });
+      if (user.emailVerified)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Email already verified.",
+        });
+      const result = await ctx.prisma.user.update({
+        where: { id: userId },
+        data: { emailVerified: new Date() },
+      });
       return result;
     }),
 });
