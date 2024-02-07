@@ -1,5 +1,6 @@
 import { AuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import prisma from "./db";
 import * as bcrypt from "bcrypt";
 import { User } from "@prisma/client";
@@ -50,6 +51,18 @@ export const authOptions: AuthOptions = {
         const { password, ...userWithoutPassword } = user;
 
         return userWithoutPassword;
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      profile(profile) {
+        return {
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+        };
       },
     }),
   ],

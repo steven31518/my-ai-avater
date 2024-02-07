@@ -1,4 +1,8 @@
-import { compileActivationTemplate, sendMail } from "@/lib/mail";
+import {
+  compileActivationTemplate,
+  compileRestPassTemplate,
+  sendMail,
+} from "@/lib/mail";
 import { publicProcedure, createTRPCRouter } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import * as bcrypt from "bcrypt";
@@ -25,7 +29,7 @@ export const authRouter = createTRPCRouter({
       });
       if (user)
         throw new TRPCError({
-          code: "BAD_REQUEST",
+          code: "METHOD_NOT_SUPPORTED",
           message: "User already exists.",
         });
 
@@ -51,21 +55,68 @@ export const authRouter = createTRPCRouter({
   emailValidation: publicProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
+      try {
+        const payload = verifyJwt(input);
+        const userId = payload?.id;
+        const user = await ctx.prisma.user.findUnique({
+          where: {
+            id: userId,
+          },
+        });
+        if (!user) return "userNotExist";
+
+        if (user.emailVerified) return "alreadyActivated";
+
+        const result = await ctx.prisma.user.update({
+          where: { id: userId },
+          data: { emailVerified: new Date() },
+        });
+        return `Your Account: ${result.email} has been activated successfully.`;
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unspecified error occurred.",
+        });
+      }
+    }),
+  forgotPassword: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          email: input,
+        },
+      });
+      if (!user)
+        throw new TRPCError({
+          code: "METHOD_NOT_SUPPORTED",
+          message: "User not found.",
+        });
+      const jwtUserId = signJwt({ id: user.id });
+      const resetPassUrl = `${process.env.NEXTAUTH_URL}/auth/resetPass/${jwtUserId}`;
+      const body = compileRestPassTemplate(user.firstName, resetPassUrl);
+
+      await sendMail({
+        to: user.email,
+        subject: "Reset password request",
+        body,
+      });
+      return `Reset password link has been sent to ${user.email}.`;
+    }),
+  resetPassValidation: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
       const payload = verifyJwt(input);
+      if (!payload)
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid token",
+        });
       const userId = payload?.id;
       const user = await ctx.prisma.user.findUnique({
         where: {
           id: userId,
         },
       });
-      if (!user) return "userNotExist";
-
-      if (user.emailVerified) return "alreadyActivated";
-
-      const result = await ctx.prisma.user.update({
-        where: { id: userId },
-        data: { emailVerified: new Date() },
-      });
-      return `Your Account: ${result.email} has been activated successfully.`;
     }),
 });

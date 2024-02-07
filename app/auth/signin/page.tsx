@@ -5,7 +5,7 @@ export default function SignInPage() {
   return (
     <div className="flex items-center justify-center flex-col pt-6">
       <SignInForm />
-      <Link href={"auth/forgotPass"}>
+      <Link href={"/auth/forgotPassword"}>
         <Button variant={"link"}>Forget Your Password?</Button>
       </Link>
     </div>
