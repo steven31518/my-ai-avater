@@ -14,10 +14,8 @@ export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(
       z.object({
-        firstName: z.string(),
-        lastName: z.string(),
+        name: z.string(),
         email: z.string(),
-        phoneNumber: z.string(),
         password: z.string(),
       })
     )
@@ -41,7 +39,7 @@ export const authRouter = createTRPCRouter({
 
       const activationUrl = `${process.env.NEXTAUTH_URL}/auth/activation/${jwtUserId}`;
 
-      const body = compileActivationTemplate(result.firstName, activationUrl);
+      const body = compileActivationTemplate(result.name, activationUrl);
 
       await sendMail({
         to: result.email,
@@ -94,7 +92,7 @@ export const authRouter = createTRPCRouter({
         });
       const jwtUserId = signJwt({ id: user.id });
       const resetPassUrl = `${process.env.NEXTAUTH_URL}/auth/resetPass/${jwtUserId}`;
-      const body = compileRestPassTemplate(user.firstName, resetPassUrl);
+      const body = compileRestPassTemplate(user.name, resetPassUrl);
 
       await sendMail({
         to: user.email,
@@ -106,17 +104,45 @@ export const authRouter = createTRPCRouter({
   resetPassValidation: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const payload = verifyJwt(input);
-      if (!payload)
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Invalid token",
+      try {
+        const payload = verifyJwt(input);
+        if (!payload) return "URLIsNotValid";
+        const userId = payload?.id;
+        const user = await ctx.prisma.user.findUnique({
+          where: {
+            id: userId,
+          },
         });
+        if (!user) return "userNotExist";
+        return "validURL";
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unspecified error occurred.",
+        });
+      }
+    }),
+  resetPassword: publicProcedure
+    .input(z.object({ password: z.string(), jwt: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const payload = verifyJwt(input.jwt);
+      if (!payload)
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Unauthorized" });
       const userId = payload?.id;
-      const user = await ctx.prisma.user.findUnique({
+      const user = ctx.prisma.user.findUnique({
         where: {
           id: userId,
         },
       });
+      if (!user)
+        throw new TRPCError({
+          code: "METHOD_NOT_SUPPORTED",
+          message: "User not found.",
+        });
+      const result = await ctx.prisma.user.update({
+        where: { id: userId },
+        data: { password: await bcrypt.hash(input.password, 10) },
+      });
+      if (result) return "Password has been reset successfully.";
     }),
 });

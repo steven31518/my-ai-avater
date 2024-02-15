@@ -1,13 +1,28 @@
 import { AuthOptions, getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import DiscordPorvider from "next-auth/providers/discord";
 import prisma from "./db";
 import * as bcrypt from "bcrypt";
 import { User } from "@prisma/client";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { Adapter } from "next-auth/adapters";
 
 export const authOptions: AuthOptions = {
   pages: {
     signIn: "/auth/signin",
+    error: "auth/error",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  events: {
+    async linkAccount({ user }) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
+    },
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -19,6 +34,7 @@ export const authOptions: AuthOptions = {
       return session;
     },
   },
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -30,6 +46,7 @@ export const authOptions: AuthOptions = {
         },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
         const user = await prisma.user.findUnique({
           where: {
@@ -42,7 +59,7 @@ export const authOptions: AuthOptions = {
           throw new Error("Please Provide Your Password.");
         const isPasswordCorrect = await bcrypt.compare(
           credentials.password,
-          user.password
+          user.password as string
         );
         if (!isPasswordCorrect)
           throw new Error("User name and password is not correct.");
@@ -56,14 +73,10 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      profile(profile) {
-        return {
-          id: profile.id,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-        };
-      },
+    }),
+    DiscordPorvider({
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
     }),
   ],
 };

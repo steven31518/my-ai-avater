@@ -67,14 +67,17 @@ export default function ForgotPasswordPage() {
                 <li>3. Reset your password.</li>
               </ol>
             </div>
-            <CustomFormField name="email" control={form.control} />
-            <div className="flex justify-center items-center">
+
+            <div className="flex flex-col justify-center items-center gap-4 md:flex-row md:items-end">
+              <div className="w-full md:w-1/2">
+                <CustomFormField name="email" control={form.control} />
+              </div>
               <Button
                 variant={"default"}
                 disabled={isPending}
-                className="capitalize w-48 self-center my-6"
+                className="capitalize w-48"
               >
-                {isPending ? "sending" : "Submit"}
+                {isPending ? "sending" : "send"}
               </Button>
             </div>
           </div>

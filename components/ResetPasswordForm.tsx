@@ -8,6 +8,9 @@ import { Button } from "./ui/button";
 import { passwordStrength } from "check-password-strength";
 import PasswordStrength from "./PasswordStrength";
 import { useEffect, useState } from "react";
+import { api } from "@/app/_trpc/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 interface Props {
   jwtUserId: string;
 }
@@ -37,9 +40,23 @@ export default function ResetPasswordForm({ jwtUserId }: Props) {
     },
   });
   const password = form.watch().password;
+  const router = useRouter();
+  const { mutate, isPending } = api.auth.resetPassword.useMutation({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: () => {
+      toast.success("Password Reset Successfully");
+    },
+    onSettled: () => {
+      form.reset();
+    },
+  });
 
   function onSubmit(data: inputType) {
-    console.log(data);
+    const { confirmPassword, ...password } = data;
+    const resetData = { ...password, jwt: jwtUserId };
+    mutate(resetData);
   }
   useEffect(() => {
     setPassStrength(passwordStrength(password).id);
@@ -51,21 +68,26 @@ export default function ResetPasswordForm({ jwtUserId }: Props) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="bg-muted p-8 grid grid-rows-subgrid gap-2 rounded place-self-stretch"
       >
-        <div className="grid grid-rows-4 grid-flow-col gap-2">
+        <div className="grid grid-rows-3 grid-flow-col gap-2">
           <h2 className="capitalize font-semibold text-4xl mb-6">
             Reset Your Password
           </h2>
-          <div className="space-y-2">
-            <CustomFormFieldPassword name="password" control={form.control} />
-            <PasswordStrength passStrength={passStrength}></PasswordStrength>
+          <div className="flex flex-col justify-center items-center md:flex-row md:items-start gap-4">
+            <div className="space-y-2">
+              <CustomFormFieldPassword name="password" control={form.control} />
+              <PasswordStrength passStrength={passStrength}></PasswordStrength>
+            </div>
+            <CustomFormFieldPassword
+              name="confirmPassword"
+              control={form.control}
+            />
           </div>
-          <CustomFormFieldPassword
-            name="confirmPassword"
-            control={form.control}
-          />
           <div className="flex justify-center items-center">
-            <Button className="capitalize w-48 self-center my-6">
-              Reset Password
+            <Button
+              className="capitalize w-48 self-center my-6"
+              disabled={isPending}
+            >
+              {isPending ? "loading" : "Reset Password"}
             </Button>
           </div>
         </div>

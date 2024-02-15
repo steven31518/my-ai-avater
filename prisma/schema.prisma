@@ -32,27 +32,14 @@ model Account {
     @@index([userId])
 }
 
-model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    @@index([userId])
-}
-
 model User {
     id                 String    @id @default(cuid())
-    firstName          String
-    lastName           String
-    password           String
+    name               String
+    password           String?
     email              String   @unique
     emailVerified      DateTime?
-    phoneNumber        String
     image              String?
     accounts           Account[]
-    sessions           Session[]
     // isPaymentSucceeded Boolean   @default(false)
     // uniqueKeyword      String?
     // modelTrainingLimit Int       @default(0)
@@ -70,11 +57,3 @@ model User {
 
 //     @@index([userId])
 // }
-
-model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
-
-    @@unique([identifier, token])
-}

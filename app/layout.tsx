@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "./_trpc/react";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import { PropsWithChildren } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,7 +20,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <main className="grid lg:grid-cols-6">
+            {/* first-col hide on small screen */}
+            <div className="hidden lg:block lg:col-span-1 lg:min-h-screen">
+              <Sidebar />
+            </div>
+            {/* second-col hide dropdown on big screen */}
+            <div className="lg:col-span-5">
+              <Navbar />
+              <div className="py-16 px-4 sm:px-8 lg:px-16">{children}</div>
+            </div>
+          </main>
+        </TRPCReactProvider>
       </body>
     </html>
   );

@@ -9,7 +9,8 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 interface Props {
   callbackUrl?: string;
@@ -23,7 +24,13 @@ const FormSchema = z.object({
 type InputType = z.infer<typeof FormSchema>;
 
 export default function SignInForm(props: Props) {
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email is already registered with another account"
+      : null;
   const router = useRouter();
+
   const form = useForm<InputType>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -43,17 +50,16 @@ export default function SignInForm(props: Props) {
     }
     router.push(props.callbackUrl ? props.callbackUrl : "/");
   }
+
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-muted p-8 rounded"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <h2 className="capitalize font-semibold text-4xl mb-6">Sign In</h2>
+        <p className="text-destructive">{urlError}</p>
         <div className="flex flex-col gap-2">
           <CustomFormField name="email" control={form.control} />
           <CustomFormFieldPassword name="password" control={form.control} />
-          <div className="flex items-center justify-center my-6">
+          <div className="flex items-center justify-center gap-4 my-6">
             <Button
               type="submit"
               className="capitalize w-48"
@@ -62,7 +68,7 @@ export default function SignInForm(props: Props) {
               {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
             </Button>
             <Link href={"/auth/signup"}>
-              <Button variant={"link"} className="capitalize w-48">
+              <Button type="button" className="capitalize w-48">
                 Sign Up
               </Button>
             </Link>

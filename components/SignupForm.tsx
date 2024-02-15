@@ -17,19 +17,12 @@ import toast from "react-hot-toast";
 
 const formSchema = z
   .object({
-    firstName: z
+    name: z
       .string()
       .min(1, { message: "First name is required" })
       .max(20, { message: "First name must be less than 20 characters" })
       .regex(new RegExp("^[a-zA-Z]+$"), {
         message: "First name must be letters only",
-      }),
-    lastName: z
-      .string()
-      .min(1, { message: "Last name is required" })
-      .max(20, { message: "Last name must be less than 20 characters" })
-      .regex(new RegExp("^[a-zA-Z]+$"), {
-        message: "last name must be letters only",
       }),
     email: z.string().email({ message: "Invalid email address" }),
     password: z
@@ -40,9 +33,6 @@ const formSchema = z
       .string()
       .min(6, { message: "Password must be at least 6 characters" })
       .max(20, { message: "Password must be less than 20 characters" }),
-    phoneNumber: z
-      .string()
-      .refine(validator.isMobilePhone, "Please enter a valid phone number"),
     acceptTerms: z.literal(true, {
       errorMap: () => ({
         message: "Please accept terms",
@@ -72,12 +62,10 @@ export default function SignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
-      phoneNumber: "",
     },
   });
 
@@ -87,11 +75,13 @@ export default function SignupForm() {
 
   const { isPending, mutate } = api.auth.register.useMutation({
     onError: (err) => {
-      console.log("onError", err);
       toast.error(err.message);
     },
     onSuccess: (data) => {
       toast.success(`Account created successfully`);
+    },
+    onSettled: () => {
+      form.reset();
     },
   });
 
@@ -112,10 +102,8 @@ export default function SignupForm() {
       >
         <h2 className="capitalize font-semibold text-4xl mb-6">Sign Up</h2>
         <div className="grid gap-4 lg:grid-cols-2 items-start">
-          <CustomFormField name="firstName" control={form.control} />
-          <CustomFormField name="lastName" control={form.control} />
+          <CustomFormField name="name" control={form.control} />
           <CustomFormField name="email" control={form.control} />
-          <CustomFormField name="phoneNumber" control={form.control} />
           <div className="space-y-2">
             <CustomFormFieldPassword name="password" control={form.control} />
             <PasswordStrength passStrength={passStrength}></PasswordStrength>

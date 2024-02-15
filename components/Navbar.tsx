@@ -1,6 +1,7 @@
 import LinksDropdown from "./LinksDropdown";
 import { Button } from "./ui/button";
 import ThemeToggle from "./ThemeToggle";
+import SigninButton from "./SigninButton";
 
 function Navbar() {
   return (
@@ -10,7 +11,7 @@ function Navbar() {
       </div>
       <div className="flex items-center gap-x-4">
         <ThemeToggle />
-        <Button variant={"default"}>Sign Out</Button>
+        <SigninButton />
       </div>
     </nav>
   );
