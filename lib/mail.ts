@@ -36,7 +36,7 @@ export async function sendMail({
     console.log(e);
   }
 }
-
+//beefree.io
 export function compileActivationTemplate(name: string, url: string) {
   const template = Handlebars.compile(activationTemplate);
   const htmlBody = template({ name, url });
