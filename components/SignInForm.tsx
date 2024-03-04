@@ -24,11 +24,6 @@ const FormSchema = z.object({
 type InputType = z.infer<typeof FormSchema>;
 
 export default function SignInForm(props: Props) {
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Email is already registered with another account"
-      : null;
   const router = useRouter();
 
   const form = useForm<InputType>({
@@ -55,7 +50,7 @@ export default function SignInForm(props: Props) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <h2 className="capitalize font-semibold text-4xl mb-6">Sign In</h2>
-        <p className="text-destructive">{urlError}</p>
+
         <div className="flex flex-col gap-2">
           <CustomFormField name="email" control={form.control} />
           <CustomFormFieldPassword name="password" control={form.control} />
