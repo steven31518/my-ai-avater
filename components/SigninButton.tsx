@@ -20,10 +20,6 @@ export default function SigninButton() {
           >
             Sign Out
           </Button>
-          {/* <Link
-            className="text-sky-500 hover:text-sky-600 transition-colors"
-            href={"/api/auth/signout"}
-          >signout</Link> */}
         </>
       ) : (
         <>

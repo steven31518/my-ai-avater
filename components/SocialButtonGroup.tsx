@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import { Button } from "./ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { IoLogoDiscord } from "react-icons/io5";
-import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 
 interface Props {
@@ -13,8 +12,6 @@ interface Props {
 }
 
 export default function SocialButtonGroup(props: Props) {
-  const router = useRouter();
-
   async function login(provider: "google" | "discord") {
     try {
       await signIn(provider, {
