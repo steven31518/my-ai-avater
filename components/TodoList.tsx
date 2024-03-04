@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { serverClient } from "../app/_trpc/server";
 import toast from "react-hot-toast";
+import Link from "next/link";
 export default function TodoList({
   initialTodos,
 }: {
@@ -41,26 +42,51 @@ export default function TodoList({
   }
   return (
     <>
-      <Input
-        type="text"
-        placeholder="some text"
-        onChange={(e) => setContent(e.target.value)}
-        value={content}
-      />
-      <Button
-        variant={"default"}
-        type="submit"
-        onClick={() => {
-          addTodo.mutate(content);
-          setContent("");
-        }}
-        disabled={addTodo.isPending}
-      >
-        {addTodo.isPending ? "Saving..." : "Save"}
-      </Button>
-      <ul>
-        {getTodo.data.map((l) => {
-          return <li key={l.id}>{l.content}</li>;
+      <div className="flex items-center justify-center gap-4">
+        <Input
+          type="text"
+          placeholder="請輸入留言"
+          onChange={(e) => setContent(e.target.value)}
+          value={content}
+        />
+        <Button
+          variant={"default"}
+          type="submit"
+          onClick={() => {
+            addTodo.mutate(content);
+            setContent("");
+          }}
+          disabled={addTodo.isPending}
+        >
+          {addTodo.isPending ? "Saving..." : "Save"}
+        </Button>
+      </div>
+
+      <ul className="mt-8">
+        {getTodo.data.map((task) => {
+          return (
+            <li
+              key={task.id}
+              className="flex justify-between items-center px-6 py-4 mb-4 border border-base-300 rounded-lg shadow-lg"
+            >
+              <h2
+                className={`text-lg capitalize ${
+                  task.completed ? "line-through" : null
+                }`}
+              >
+                {task.content}
+              </h2>
+              <div className="flex gap-6 items-center">
+                <Link
+                  href={`/tasks/${task.id}`}
+                  className="btn btn-accent btn-xs"
+                >
+                  edit
+                </Link>
+                {/* <DeleteForm id={task.id} /> */}
+              </div>
+            </li>
+          );
         })}
       </ul>
     </>

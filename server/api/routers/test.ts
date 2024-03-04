@@ -1,10 +1,13 @@
-
 import { publicProcedure, createTRPCRouter } from "../trpc";
 import { z } from "zod";
 export const testRouter = createTRPCRouter({
   getTodos: publicProcedure.query(async ({ ctx }) => {
     const { prisma } = ctx;
-    return prisma.task.findMany();
+    return prisma.task.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   }),
   addTodo: publicProcedure
     .input(z.string().min(1))

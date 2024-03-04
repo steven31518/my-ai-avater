@@ -9,17 +9,13 @@ type NavLink = {
 const links: NavLink[] = [
   {
     href: "/tasks",
-    label: "tasks",
+    label: "個人記事",
     icon: <Layers />,
   },
-  {
-    href: "/collections",
-    label: "collections",
-    icon: <AppWindow />,
-  },
+
   {
     href: "/profile",
-    label: "profile",
+    label: "個人檔案",
     icon: <AreaChart />,
   },
 ];
