@@ -1,10 +1,10 @@
 "use client";
+
 import React from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "./ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { IoLogoDiscord } from "react-icons/io5";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 
