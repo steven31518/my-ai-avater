@@ -1,4 +1,5 @@
 "use client";
+
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +11,6 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 interface Props {
   callbackUrl?: string;
