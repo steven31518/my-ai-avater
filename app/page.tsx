@@ -11,7 +11,7 @@ export default async function Home() {
             登入驗證除了google、discord還包含了credentials，註冊與信箱認證、登入與密碼重設驗證等流程。
           </p>
           <Link
-            href="/tasks"
+            href="/auth/signin"
             className="bg-blue-500 border rounded-full hover:bg-blue-400 p-4 "
           >
             馬上開始
