@@ -48,7 +48,7 @@ export default function SignInForm(props: Props) {
       toast.error(result?.error as string);
       return;
     }
-    router.push(props.callbackUrl ? props.callbackUrl : "/");
+    router.push(props.callbackUrl ? props.callbackUrl : "/profile");
   }
 
   return (

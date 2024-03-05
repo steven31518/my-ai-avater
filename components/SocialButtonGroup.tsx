@@ -14,7 +14,7 @@ export default function SocialButtonGroup(props: Props) {
   async function login(provider: "google" | "discord") {
     try {
       await signIn(provider, {
-        callbackUrl: props.callbackUrl ? props.callbackUrl : "/",
+        callbackUrl: props.callbackUrl ? props.callbackUrl : "/profile",
       });
     } catch (error) {
       console.log(error);
