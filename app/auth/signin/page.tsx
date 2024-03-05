@@ -8,12 +8,12 @@ import { Suspense } from "react";
 export default function SignInPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <div className="flex items-center justify-center flex-col pt-6 ">
-        <div className="bg-muted p-8 rounded">
+      <div className="grid pt-6">
+        <div className="bg-muted p-8 rounded place-self-center max-w-sm">
           <SignInForm />
           <SocialButtonGroup />
         </div>
-        <Link href={"/auth/forgotPassword"}>
+        <Link href={"/auth/forgotPassword"} className="place-self-center">
           <Button variant={"link"}>Forget Your Password?</Button>
         </Link>
       </div>

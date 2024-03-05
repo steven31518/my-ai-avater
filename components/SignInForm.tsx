@@ -62,13 +62,13 @@ export default function SignInForm(props: Props) {
           <div className="flex items-center justify-center gap-4 my-6">
             <Button
               type="submit"
-              className="capitalize w-48"
+              className="capitalize w-36"
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? "Signing In..." : "Sign In"}
             </Button>
             <Link href={"/auth/signup"}>
-              <Button type="button" className="capitalize w-48">
+              <Button type="button" className="capitalize w-36">
                 Sign Up
               </Button>
             </Link>
